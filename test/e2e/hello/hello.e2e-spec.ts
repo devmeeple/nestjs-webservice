@@ -35,4 +35,21 @@ describe('Hello', () => {
             .expect(HttpStatus.OK)
             .expect('hello');
     });
+
+    it('[GET] /hello/dto', () => {
+        // given
+        const name = 'hello';
+        const amount = 1000;
+
+        // when + then => expect
+        return request(app.getHttpServer())
+            .get(`/hello/dto?name=${name}&amount=${amount}`)
+            .expect(HttpStatus.OK)
+            .expect((res) => {
+                expect(res.body).toEqual({
+                    name,
+                    amount: amount.toString(),
+                });
+            });
+    });
 });
