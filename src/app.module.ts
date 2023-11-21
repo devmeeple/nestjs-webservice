@@ -17,7 +17,7 @@ import {PostsEntity} from './posts/entities/posts.entity';
       database: 'postgres',
       entities: [ PostsEntity],
       synchronize: true,
-      logging: true, // spring.jpa.show_sql=true
+      // logging: true, // spring.jpa.show_sql=true
     }),
     PostsModule,
   ],
