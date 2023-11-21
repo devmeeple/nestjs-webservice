@@ -65,7 +65,9 @@ export class PostsService {
             throw new NotFoundException('데이터를 찾을 수 없습니다.');
         }
 
-        Object.assign(foundPost, updateRequest);
+        // Object.assign(foundPost, updateRequest);
+        foundPost.title = updateRequest.title;
+        foundPost.content = updateRequest.content;
         return await this.postsRepository.save(foundPost);
     }
 }

@@ -6,10 +6,16 @@ import {CreatePostDto} from '../../../src/posts/dto/create-post.dto';
 import {Repository} from 'typeorm';
 import {PostsEntity} from '../../../src/posts/entities/posts.entity';
 import {getRepositoryToken} from '@nestjs/typeorm';
+import {UpdatePostDto} from '../../../src/posts/dto/update-post.dto';
 
 describe('Posts (e2e)', () => {
     let app: INestApplication;
     let postsRepository: Repository<PostsEntity>;
+    const requestPost: CreatePostDto = {
+        title: '게시물 작성 테스트 제목1',
+        content: '게시물 작성 테스트 내용1',
+        author: 'devmeeple@gmail.com',
+    };
 
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -34,11 +40,6 @@ describe('Posts (e2e)', () => {
 
     it('[POST:게시물 작성] /posts', async () => {
         // given
-        const requestPost: CreatePostDto = {
-            title: '게시물 작성 테스트 제목1',
-            content: '게시물 작성 테스트 내용1',
-            author: 'devmeeple@gmail.com',
-        };
 
         // when
         const response = await request(app.getHttpServer())
@@ -64,6 +65,59 @@ describe('Posts (e2e)', () => {
 
         // then
         expect(Array.isArray(response.body)).toBeTruthy();
+    });
 
+    it('[GET:단건조회] /posts/:id', async () => {
+        // given
+        const savedPost = await postsRepository.save(requestPost);
+
+        // when
+        const response = await request(app.getHttpServer())
+            .get(`/posts/${savedPost.id}`)
+            .expect(HttpStatus.OK)
+
+        // then
+        expect(response.body).toHaveProperty('id', savedPost.id);
+        expect(response.body.title).toEqual(requestPost.title);
+        expect(response.body.content).toEqual(requestPost.content);
+        expect(response.body.author).toEqual(requestPost.author);
+    });
+
+    it('[DELETE:삭제] /posts/:id', async () => {
+        // given
+        const savedPost = await postsRepository.save(requestPost);
+
+        // when
+        const response = await request(app.getHttpServer())
+            .delete(`/posts/${savedPost.id}`)
+            .expect(HttpStatus.OK)
+
+        // then
+        const postInDb = await postsRepository.findOne({
+            where: {
+                id: savedPost.id
+            }
+        });
+        expect(postInDb).toBeNull();
+    });
+
+
+    it('[PUT:수정] /posts/:id', async () => {
+        // given
+        const updatedPost: UpdatePostDto = {
+            title: '수정된 게시글 제목',
+            content: '수정된 게시글 내용',
+        };
+        const savedPost = await postsRepository.save(requestPost);
+
+        // when
+        const response = await request(app.getHttpServer())
+            .put(`/posts/${savedPost.id}`)
+            .send(updatedPost)
+            .expect(HttpStatus.OK);
+
+        // then
+        expect(response.body.title).toEqual(updatedPost.title);
+        expect(response.body.content).toEqual(updatedPost.content);
     });
 });
