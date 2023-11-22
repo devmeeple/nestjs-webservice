@@ -1,4 +1,4 @@
-import {HttpStatus, INestApplication} from '@nestjs/common';
+import {HttpStatus, INestApplication, ValidationPipe} from '@nestjs/common';
 import {Test, TestingModule} from '@nestjs/testing';
 import {AppModule} from '../../../src/app.module';
 import * as request from 'supertest';
@@ -20,9 +20,12 @@ describe('Posts (e2e)', () => {
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [AppModule],
+
         }).compile();
 
         app = moduleFixture.createNestApplication();
+        app.useGlobalPipes(new ValidationPipe()); // class validation
+
         await app.init();
 
         // 레포지토리 가져오기
@@ -52,6 +55,25 @@ describe('Posts (e2e)', () => {
         expect(response.body.title).toEqual(requestPost.title);
         expect(response.body.content).toEqual(requestPost.content);
         expect(response.body.author).toEqual(requestPost.author);
+    });
+
+    it('[POST:유효성 검증] /posts', async () => {
+        // given
+        const badPost = {
+            title: '', // 제목은 필수입니다.
+            content: '이 테스트는 실패합니다.',
+            author: 'devmeeple@gmail.com',
+        };
+
+        // when
+        const response = await request(app.getHttpServer())
+            .post('/posts')
+            .send(badPost)
+            .expect(HttpStatus.BAD_REQUEST);
+
+        // then
+        expect(response.body.message).toContain('제목은 필수입니다.');
+
     });
 
     it('[GET:전체조회] /posts', async () => {
@@ -120,4 +142,23 @@ describe('Posts (e2e)', () => {
         expect(response.body.title).toEqual(updatedPost.title);
         expect(response.body.content).toEqual(updatedPost.content);
     });
+
+    it('[PUT:유효성 검증 실패] /posts/:id', async () => {
+        // given
+        const invalidUpdate: UpdatePostDto = {
+            title: '',
+            content: '',
+        };
+
+        const savedPost = await postsRepository.save(requestPost);
+
+        // when
+        await request(app.getHttpServer())
+            .put(`/posts/${savedPost.id}`)
+            .send(invalidUpdate)
+            .expect(HttpStatus.BAD_REQUEST);
+
+        // then
+    });
+
 });
