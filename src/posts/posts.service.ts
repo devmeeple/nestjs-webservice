@@ -4,6 +4,7 @@ import {PostsEntity} from './entities/posts.entity';
 import {Repository} from 'typeorm';
 import {CreatePostDto} from './dto/create-post.dto';
 import {UpdatePostDto} from './dto/update-post.dto';
+import {PostResponeDto} from './dto/post-respone.dto';
 
 @Injectable()
 export class PostsService {
@@ -17,13 +18,15 @@ export class PostsService {
         // 객체를 먼저 생성하고 저장한다.
         const createdPost = this.postsRepository.create(request);
         await this.postsRepository.save(createdPost);
-        return createdPost;
+        // 응답객체로 변환하여 제공
+        return new PostResponeDto(createdPost);
     }
 
     async findAll() {
         // 전체조회: find()
         // 단거조회: findOne()
-        return await this.postsRepository.find();
+        const posts = await this.postsRepository.find();
+        return posts.map(post => new PostResponeDto(post));
     }
 
     async findById(id: number) {
