@@ -25,7 +25,17 @@ export class CommonService {
     repository: Repository<T>,
     overrideFindOptions: FindManyOptions<T> = {},
   ) {
+    const findOptions = this.composeFindOptions<T>(request);
 
+    const [data, count] = await repository.findAndCount({
+      ...findOptions,
+      ...overrideFindOptions,
+    });
+
+    return {
+      data,
+      total: count,
+    };
   }
   private async cursorPaginate<T extends BaseTimeEntity>(
     request: BasePaginationDto,
@@ -42,7 +52,7 @@ export class CommonService {
 
     const lastItem = results.length > 0 && results.length === request.take ? results[results.length - 1] : null;
 
-    const nextURL = lastItem && new URL(`${PROTOCOL}://${HOST}/posts`);
+    const nextURL = lastItem && new URL(`${PROTOCOL}://${HOST}/${path}`);
 
     if (nextURL) {
       /**
