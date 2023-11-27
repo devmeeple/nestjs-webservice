@@ -5,11 +5,12 @@ import {
   Get,
   Param,
   Post,
-  Put,
+  Put, Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PaginatePostDto } from './dto/paginate-post.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -21,8 +22,15 @@ export class PostsController {
   }
 
   @Get()
-  async findAll() {
-    return this.postsService.findAll();
+  async findAll(@Query() query: PaginatePostDto) {
+    // return this.postsService.findAll();
+    return this.postsService.paginatePosts(query);
+  }
+
+  @Post('random')
+  async postPostRandom() {
+    await this.postsService.generatePosts();
+    return '성공적으로 작성되었습니다.';
   }
 
   @Get(':id')
