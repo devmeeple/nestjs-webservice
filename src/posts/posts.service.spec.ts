@@ -1,9 +1,9 @@
-import {Test, TestingModule} from '@nestjs/testing';
-import {PostsService} from './posts.service';
-import {getRepositoryToken} from '@nestjs/typeorm';
-import {PostsEntity} from './entities/posts.entity';
-import {Repository} from 'typeorm';
-import {NotFoundException} from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { PostsService } from './posts.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { PostsEntity } from './entities/posts.entity';
+import { Repository } from 'typeorm';
+import { NotFoundException } from '@nestjs/common';
 
 describe('PostsService 단위테스트(Unit Test)', () => {
   let service: PostsService;
@@ -20,12 +20,12 @@ describe('PostsService 단위테스트(Unit Test)', () => {
 
     // 필요한 메소드 모킹
     mockRepository = {
-      create: jest.fn().mockImplementation(post => {
+      create: jest.fn().mockImplementation((post) => {
         return { id: mockPosts.length + 1, ...post };
       }),
-      save: jest.fn().mockImplementation(post => {
+      save: jest.fn().mockImplementation((post) => {
         // index 조회하여 이미 있으면 업데이트, 없으면 새로 추가
-        const index = mockPosts.findIndex(p => p.id === post.id);
+        const index = mockPosts.findIndex((p) => p.id === post.id);
         if (index === -1) {
           mockPosts.push(post);
         } else {
@@ -35,25 +35,27 @@ describe('PostsService 단위테스트(Unit Test)', () => {
       }),
       find: jest.fn().mockImplementation(() => Promise.resolve(mockPosts)),
       findOne: jest.fn().mockImplementation((condition) => {
-        return Promise.resolve(mockPosts.find(post => post.id === condition.where.id));
+        return Promise.resolve(
+          mockPosts.find((post) => post.id === condition.where.id),
+        );
       }),
       delete: jest.fn().mockImplementation((id) => {
-        const index = mockPosts.findIndex(post => post.id === id);
+        const index = mockPosts.findIndex((post) => post.id === id);
         if (index === -1) {
           throw new NotFoundException('데이터를 찾을 수 없습니다.');
         }
         mockPosts.splice(index, 1);
-        return Promise.resolve({ affected: 1} );
+        return Promise.resolve({ affected: 1 });
       }),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-          PostsService,
-          {
-            provide: getRepositoryToken(PostsEntity),
-            useValue: mockRepository,
-          },
+        PostsService,
+        {
+          provide: getRepositoryToken(PostsEntity),
+          useValue: mockRepository,
+        },
       ],
     }).compile();
 
