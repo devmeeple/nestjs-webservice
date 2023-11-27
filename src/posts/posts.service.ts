@@ -8,12 +8,14 @@ import { PostResponeDto } from './dto/post-respone.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { request } from 'express';
 import { HOST, PROTOCOL } from '../common/const/env.const';
+import { CommonService } from '../common/common.service';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(PostsEntity)
-    private postsRepository: Repository<PostsEntity>,
+    private readonly postsRepository: Repository<PostsEntity>,
+    private readonly commonService: CommonService
   ) {}
 
   async create(request: CreatePostDto) {
@@ -33,11 +35,7 @@ export class PostsService {
 
   // 1) 오름차순으로 정렬하는 pagination 구현
   async paginatePosts(request: PaginatePostDto) {
-    if (request.page) {
-      return this.pagePaginationPosts(request);
-    } else {
-      return this.cursorPaginatePosts(request);
-    }
+    return this.commonService.paginate(request, this.postsRepository, {}, 'posts');
   }
 
   async pagePaginationPosts(request: PaginatePostDto) {
@@ -64,10 +62,10 @@ export class PostsService {
   async cursorPaginatePosts(request: PaginatePostDto) {
     const where: FindOptionsWhere<PostsEntity> = {};
 
-    if (request.where__id_less_than) {
-      where.id = LessThan(request.where__id_less_than);
-    } else if (request.where__id_more_than) {
-      where.id = MoreThan(request.where__id_more_than);
+    if (request.where__id__less_than) {
+      where.id = LessThan(request.where__id__less_than);
+    } else if (request.where__id__more_than) {
+      where.id = MoreThan(request.where__id__more_than);
     }
 
     // 1, 2, 3, 4, 5
@@ -96,7 +94,7 @@ export class PostsService {
        */
       for (const key of Object.keys(request)) {
         if (request[key]) {
-          if (key !== 'where__id_more_than' && key !== 'where__id_less_than') {
+          if (key !== 'where__id__more_than' && key !== 'where__id__less_than') {
             nextURL.searchParams.append(key, request[key]);
           }
         }
@@ -105,9 +103,9 @@ export class PostsService {
       let key = null;
 
       if (request.order__createdAt === 'ASC') {
-        key = 'where__id_more_than';
+        key = 'where__id__more_than';
       } else {
-        key = 'where__id_less_than';
+        key = 'where__id__less_than';
       }
 
       nextURL.searchParams.append(key, lastItem.id.toString());
