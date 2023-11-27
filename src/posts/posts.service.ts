@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostsEntity } from './entities/posts.entity';
-import { MoreThan, Repository } from 'typeorm';
+import { FindOptionsWhere, LessThan, MoreThan, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostResponeDto } from './dto/post-respone.dto';
@@ -33,12 +33,17 @@ export class PostsService {
 
   // 1) 오름차순으로 정렬하는 pagination 구현
   async paginatePosts(request: PaginatePostDto) {
+    const where: FindOptionsWhere<PostsEntity> = {};
+
+    if (request.where__id_less_than) {
+      where.id = LessThan(request.where__id_less_than);
+    } else if (request.where__id_more_than) {
+      where.id = MoreThan(request.where__id_more_than);
+    }
+
     // 1, 2, 3, 4, 5
     const posts = await this.postsRepository.find({
-      where: {
-        // 더 크다 / 더 많다.
-        id: MoreThan(request.where__id_more_than ?? 0),
-      },
+      where,
       order: {
         createdAt: request.order__createdAt,
       },
@@ -62,13 +67,21 @@ export class PostsService {
        */
       for (const key of Object.keys(request)) {
         if (request[key]) {
-          if (key !== 'where__id_more_than') {
+          if (key !== 'where__id_more_than' && key !== 'where__id_less_than') {
             nextURL.searchParams.append(key, request[key]);
           }
         }
       }
 
-      nextURL.searchParams.append('where__more_id_more_than', lastItem.id.toString());
+      let key = null;
+
+      if (request.order__createdAt === 'ASC') {
+        key = 'where__id_more_than';
+      } else {
+        key = 'where__id_less_than';
+      }
+
+      nextURL.searchParams.append(key, lastItem.id.toString());
     }
 
     /**
