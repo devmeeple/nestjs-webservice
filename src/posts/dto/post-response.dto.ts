@@ -1,6 +1,6 @@
 import { PostsEntity } from '../entities/posts.entity';
 
-export class PostResponeDto {
+export class PostResponseDto {
   id: number;
   title: string;
   content: string;

@@ -4,7 +4,7 @@ import { PostsEntity } from './entities/posts.entity';
 import { FindOptionsWhere, LessThan, MoreThan, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { PostResponeDto } from './dto/post-respone.dto';
+import { PostResponseDto } from './dto/post-response.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { request } from 'express';
 import { HOST, PROTOCOL } from '../common/const/env.const';
@@ -23,14 +23,14 @@ export class PostsService {
     const createdPost = this.postsRepository.create(request);
     await this.postsRepository.save(createdPost);
     // 응답객체로 변환하여 제공
-    return new PostResponeDto(createdPost);
+    return new PostResponseDto(createdPost);
   }
 
   async findAll() {
     // 전체조회: find()
     // 단거조회: findOne()
     const posts = await this.postsRepository.find();
-    return posts.map((post) => new PostResponeDto(post));
+    return posts.map((post) => new PostResponseDto(post));
   }
 
   // 1) 오름차순으로 정렬하는 pagination 구현
