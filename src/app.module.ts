@@ -1,10 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { HelloController } from './hello/hello.controller';
-import { PostsModule } from './posts/posts.module';
-import {TypeOrmModule} from '@nestjs/typeorm';
-import {PostsEntity} from './posts/entities/posts.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -15,13 +12,12 @@ import {PostsEntity} from './posts/entities/posts.entity';
       username: 'postgres',
       password: 'postgres',
       database: 'postgres',
-      entities: [ PostsEntity],
+      entities: [],
       synchronize: true,
       // logging: true, // spring.jpa.show_sql=true
     }),
-    PostsModule,
   ],
-  controllers: [AppController, HelloController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
