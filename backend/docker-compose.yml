@@ -1,12 +1,15 @@
+version: "3.8"
+
 services:
   postgres:
     image: postgres:15
     restart: always
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
+    # env 파일이 여러개가 되거나 다른 위치에 있는 경우 docker-compose --env-file 옵션 추가
     ports:
-      - "5432:5432"
+      - "${DATABASE_PORT}:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
