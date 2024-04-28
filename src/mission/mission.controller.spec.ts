@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MissionController } from './mission.controller';
 import { CalcRequestDto } from './dto/request/calc-request.dto';
 import { DayOfWeekRequestDto } from './dto/request/day-of-week-request.dto';
+import { SumRequestDto } from './dto/request/sum-request.dto';
 
 describe('MissionController', () => {
   let sut: MissionController;
@@ -42,5 +43,17 @@ describe('MissionController', () => {
     // then
     expect(act).toBeDefined();
     expect(act.dayOfWeek).toBe('SUN');
+  });
+
+  it('숫자를 입력받아 총 합을 반환한다', () => {
+    // given
+    const numbers = [1, 2, 3, 4, 5];
+    const request = new SumRequestDto(numbers);
+
+    // when
+    const act = sut.sumNumbers(request);
+
+    // then
+    expect(act).toBe(15);
   });
 });

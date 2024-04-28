@@ -1,8 +1,9 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { CalcRequestDto } from './dto/request/calc-request.dto';
 import { CalcResponseDto } from './dto/response/calc-response.dto';
 import { DayOfWeekRequestDto } from './dto/request/day-of-week-request.dto';
 import { DayOfWeekResponseDto } from './dto/response/day-of-week-response.dto';
+import { SumRequestDto } from './dto/request/sum-request.dto';
 
 @Controller('/api/v1')
 export class MissionController {
@@ -23,5 +24,10 @@ export class MissionController {
     const week = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
     const dateIndex = new Date(request.date).getDay();
     return new DayOfWeekResponseDto(week[dateIndex]);
+  }
+
+  @Post('sum')
+  sumNumbers(@Body() request: SumRequestDto) {
+    return request.numbers.reduce((acc, number) => acc + number, 0);
   }
 }
