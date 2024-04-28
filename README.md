@@ -47,6 +47,10 @@ GET /api/v1/day-of-the-week?date=2023-01-01
 }
 ```
 
+### 📈 풀이
+
+- [해당날짜 구하기](https://www.w3schools.com/jsref/jsref_getday.asp)
+
 ## 문제3
 
 - 여러 수를 받아 총 합을 반환하는 `POST` API 구현

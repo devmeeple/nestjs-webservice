@@ -1,6 +1,8 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { CalcRequestDto } from './dto/request/calc-request.dto';
 import { CalcResponseDto } from './dto/response/calc-response.dto';
+import { DayOfWeekRequestDto } from './dto/request/day-of-week-request.dto';
+import { DayOfWeekResponseDto } from './dto/response/day-of-week-response.dto';
 
 @Controller('/api/v1')
 export class MissionController {
@@ -14,5 +16,12 @@ export class MissionController {
     const multiply = num1 * num2;
 
     return new CalcResponseDto(add, minus, multiply);
+  }
+
+  @Get('day-of-the-week')
+  getDayOfWeek(@Query() request: DayOfWeekRequestDto) {
+    const week = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const dateIndex = new Date(request.date).getDay();
+    return new DayOfWeekResponseDto(week[dateIndex]);
   }
 }
