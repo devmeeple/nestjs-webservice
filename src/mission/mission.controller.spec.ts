@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MissionController } from './mission.controller';
+import { CalcRequestDto } from './dto/request/calc-request.dto';
 
 describe('MissionController', () => {
   let sut: MissionController;
@@ -16,20 +17,17 @@ describe('MissionController', () => {
     expect(sut).toBeDefined();
   });
 
-  it('두 수를 입력하면 덧셈, 뺄셈, 곱셈 결과를 반환한다', () => {
+  it('덧셈, 뺄셈, 곱셈 결과를 반환한다', () => {
     // given
-    const num1 = 5;
-    const num2 = 10;
-    const result = {
-      add: num1 + num2,
-      minus: num1 - num2,
-      multiply: num1 * num2,
-    };
+    const request = new CalcRequestDto(10, 5);
 
     // when
-    const act = sut.getCalc(num1, num2);
+    const act = sut.getCalc(request);
 
     // then
-    expect(act).toEqual(result);
+    expect(act).toBeDefined();
+    expect(act.add).toBe(15);
+    expect(act.minus).toBe(5);
+    expect(act.multiply).toBe(50);
   });
 });
